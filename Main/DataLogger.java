@@ -20,21 +20,22 @@ public class DataLogger {
     private class SyncListener implements CanOpenListener{
         @Override
         public void onMessage(CanMessage canMessage) {
-            System.out.println("SYNC message received");
-            if(GlobalVars.START_TIME == null){
-                GlobalVars.START_TIME = System.nanoTime();
-                System.out.println(dfmt.produceHeader(nodeIds));
-            }	
-            AccelerometerReading readings[] = new AccelerometerReading[4];
-            readings[0] = node1.getLatestReading();
-            readings[1] = node2.getLatestReading();
-            readings[2] = node3.getLatestReading();
-            readings[3] = node4.getLatestReading();
-//            System.out.println(dfmt.producePrettyOutputString(readings));
+	        System.out.println("SYNC message received");
+	        if (GlobalVars.START_TIME == null) {
+		        GlobalVars.START_TIME = System.nanoTime();
+		        System.out.println(dfmt.produceHeader(nodeIds));
+	        } else {
+	        	//Skip the first sync message since object dictionary entries have not been set
+		        AccelerometerReading readings[] = new AccelerometerReading[4];
+		        readings[0] = node1.getLatestReading();
+		        readings[1] = node2.getLatestReading();
+		        readings[2] = node3.getLatestReading();
+		        readings[3] = node4.getLatestReading();
+//              System.out.println(dfmt.producePrettyOutputString(readings));
 
-            System.out.println(dfmt.produceOutputLine(readings));
+		        System.out.println(dfmt.produceOutputLine(readings));
+	        }
         }
-
 
         @Override
         public void onObjDictChange(SubEntry se){}
