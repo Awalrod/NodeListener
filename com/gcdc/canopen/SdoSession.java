@@ -31,14 +31,6 @@ class SdoSession
 	}
 
 
-	// SDO (un)packing macros
-	// Returns the command specifier (cs, ccs, scs) top 3 bits from the first byte of the SDO
-	private int extractCmdSpecifier()
-	{
-		int firstByte = (0x000000FF &(int)(msg.data[0]));
-		return(firstByte>>5);
-	}
-
 
 // Returns the number of bytes without data from the first byte of the SDO. Coded in 2 bits
 //#define getSDOn2(byte) ((byte >> 2) & 3)
@@ -48,9 +40,12 @@ class SdoSession
 	}
 
 
+	// SDO (un)packing macros
+	// Returns the command specifier (cs, ccs, scs) top 3 bits from the first byte of the SDO
 	private int extractCommandSpecifier()
 	{
-		return((msg.data[0]>>5)&0x03);
+		int firstByte = (0x000000FF &(int)(msg.data[0]));
+		return(firstByte>>5);
 	}
 
 
@@ -237,6 +232,7 @@ class SdoSession
 		subIndex = Sdo.extractSubIndex(msg);
 		if(inProgress == true)
 		{
+			System.out.println(getClass()+".uploadRequest()  sdo in progress");
 			sdo.sendAbort( index, subIndex, Sdo.SDOABT_LOCAL_CTRL_ERROR);
 		}
 //	System.out.println(getClass()+".uploadRequest()");
@@ -283,7 +279,7 @@ class SdoSession
 	boolean processMessage(CanMessage msg) throws COException, java.io.IOException
 	{
 		this.msg = msg;
-		int cmd = extractCmdSpecifier();
+		int cmd = extractCommandSpecifier();
 //		System.out.println("SdoSession.processMessege "+cmd);
 		switch(cmd)
 		{
@@ -302,7 +298,11 @@ class SdoSession
 		case 3: //segmented upload request
 			return( segmentUploadRequest());
 		case 4: // Received SDO abort code
-		System.out.println("recieved abort code");
+			int index = Sdo.extractIndex(msg);
+			int subIndex = Sdo.extractSubIndex(msg);
+
+			System.out.println("Recieved abort code: "+cmd+"  Index: 0x"+ String.format("%04X", index).toUpperCase()+"  sub: 0x"+ String.format("%02X", subIndex).toUpperCase());
+			msg.dump();
 			return(false);
 		case 5:
 		case 6:
