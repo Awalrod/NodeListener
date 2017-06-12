@@ -46,7 +46,7 @@ public class DataFormatter {
      * @return A header comment
      */
     public String produceHeader(int[] indexes){
-        String header = new String(";").concat(new SimpleDateFormat("HH:mm:ss").format(new Date()));
+        String header = new String(";").concat(new SimpleDateFormat("EEE d MMM yyyy HH:mm:ss:SS z").format(new Date()));
         for(int index : indexes){
             header = header.concat(","+Integer.toHexString(index)+"(X)");
             header = header.concat(","+Integer.toHexString(index)+"(Y)");
