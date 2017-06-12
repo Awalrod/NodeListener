@@ -36,6 +36,7 @@ public class DataFormatter {
             retVal = retVal.concat(reading.toString());
         }
         return retVal;
+
     }
 
     /**
