@@ -15,6 +15,7 @@ import GlobalVars.GlobalVars;
 public class DataLogger {
     private CanOpen co;
     private NodeTracker node1, node2, node3, node4;
+    private int nodeIds[];
     private DataFormatter dfmt;
     private class SyncListener implements CanOpenListener{
         @Override
@@ -22,13 +23,16 @@ public class DataLogger {
             System.out.println("SYNC message received");
             if(GlobalVars.START_TIME == null){
                 GlobalVars.START_TIME = System.nanoTime();
+                System.out.println(dfmt.produceHeader(nodeIds));
             }	
             AccelerometerReading readings[] = new AccelerometerReading[4];
             readings[0] = node1.getLatestReading();
             readings[1] = node2.getLatestReading();
             readings[2] = node3.getLatestReading();
             readings[3] = node4.getLatestReading();
-            System.out.println(dfmt.produceOutputString(readings));
+//            System.out.println(dfmt.producePrettyOutputString(readings));
+
+            System.out.println(dfmt.produceOutputLine(readings));
         }
 
 
@@ -42,7 +46,7 @@ public class DataLogger {
         Driver drvr;
         try{
             System.out.println("CANbus driver starting");
-
+            nodeIds = new int[]{0x6210, 0x6211, 0x6212, 0x6213};
             DriverManager dm = new DriverManager("datagram", "192.168.1.54", 2000, false);
             drvr = dm.getDriver();
             System.out.println("CANbus driver configured");
