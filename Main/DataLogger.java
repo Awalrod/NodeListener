@@ -19,6 +19,7 @@ public class DataLogger {
     private class SyncListener implements CanOpenListener{
         @Override
         public void onMessage(CanMessage canMessage) {
+            System.out.println("SYNC message received");
             if(GlobalVars.START_TIME == null){
                 GlobalVars.START_TIME = System.nanoTime();
             }	
