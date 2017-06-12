@@ -33,9 +33,9 @@ public class DataLogger {
 		        readings[3] = node4.getLatestReading();
 //              System.out.println(dfmt.producePrettyOutputString(readings));
 
-		        System.out.println(dfmt.produceOutputLine(readings));
-	        }
+            System.out.println(dfmt.produceOutputLine(readings));
         }
+
 
         @Override
         public void onObjDictChange(SubEntry se){}
