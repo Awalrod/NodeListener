@@ -3,7 +3,7 @@ package com.gcdc.can;
 import com.gcdc.can.dummy.DummyDriver;
 import com.gcdc.can.socket.SocketDriver;
 import com.gcdc.can.datagram.DatagramDriver;
-//import com.com.gcdc.can.uart.UartDriver;
+//import com.gcdc.can.uart.UartDriver;
 import com.gcdc.can.ConfigFile;
 
 

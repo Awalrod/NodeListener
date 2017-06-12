@@ -2,7 +2,7 @@ package com.gcdc.canopen;
 
 import com.gcdc.can.CanMessage;
 import com.gcdc.can.Driver;
-//import com.com.gcdc.can.CanMessageConsumer;
+//import com.gcdc.can.CanMessageConsumer;
 import java.util.TimerTask;
 import java.util.Timer;
 import java.nio.ByteBuffer;
@@ -35,7 +35,8 @@ class SdoSession
 	// Returns the command specifier (cs, ccs, scs) top 3 bits from the first byte of the SDO
 	private int extractCmdSpecifier()
 	{
-		return(msg.data[0]>>5);
+		int firstByte = (0x000000FF &(int)(msg.data[0]));
+		return(firstByte>>5);
 	}
 
 

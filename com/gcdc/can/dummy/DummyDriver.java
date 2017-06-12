@@ -2,7 +2,7 @@ package com.gcdc.can.dummy;
 import java.util.Timer;
 
 import com.gcdc.can.CanMessage;
-//import com.com.gcdc.can.TraceStorm;
+//import com.gcdc.can.TraceStorm;
 import com.gcdc.can.Driver;
 import com.gcdc.can.ConfigFile;
 import com.gcdc.can.CanMessageConsumer; 
