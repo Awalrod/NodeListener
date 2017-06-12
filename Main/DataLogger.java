@@ -15,7 +15,7 @@ import GlobalVars.GlobalVars;
 public class DataLogger {
     private CanOpen co;
     private NodeTracker node1, node2, node3, node4;
-    private int nodeIds[];
+    private int odIndexes[] = new int[]{0x6210, 0x6211, 0x6212, 0x6213};
     private DataFormatter dfmt;
     private class SyncListener implements CanOpenListener{
         @Override
@@ -23,7 +23,7 @@ public class DataLogger {
 //	        System.out.println("SYNC message received");
 	        if (GlobalVars.START_TIME == null) {
 		        GlobalVars.START_TIME = System.nanoTime();
-		        System.out.println(dfmt.produceHeader(nodeIds));
+		        System.out.println(dfmt.produceHeader(odIndexes));
 	        } else {
 		        //Skip the first sync message since object dictionary entries have not been set
 		        AccelerometerReading readings[] = new AccelerometerReading[4];
@@ -47,17 +47,16 @@ public class DataLogger {
         Driver drvr;
         try{
             System.out.println("CANbus driver starting");
-            nodeIds = new int[]{0x6210, 0x6211, 0x6212, 0x6213};
             DriverManager dm = new DriverManager("datagram", "192.168.1.54", 2000, false);
             drvr = dm.getDriver();
             System.out.println("CANbus driver configured");
             ObjectDictionary od = DefaultOD.create(0x23);
             co = new CanOpen(drvr, od, 0x23, false);
 
-            node1 = new NodeTracker(co,0x281,0x10,0x6210,0x3,0x10, 0,1,2);
-            node2 = new NodeTracker(co, 0x282, 0x11, 0x6211, 0x3, 0x10, 0,1,2);
-            node3 = new NodeTracker(co, 0x283, 0x12, 0x6212, 0x3, 0x10, 0,1,2);
-            node4 = new NodeTracker(co, 0x284, 0x13, 0x6213, 0x3, 0x10, 0,1,2);
+            node1 = new NodeTracker(co,0x281,0x10, odIndexes[0],0x3,0x10, 0,1,2);
+            node2 = new NodeTracker(co, 0x282, 0x11, odIndexes[1], 0x3, 0x10, 0,1,2);
+            node3 = new NodeTracker(co, 0x283, 0x12, odIndexes[2], 0x3, 0x10, 0,1,2);
+            node4 = new NodeTracker(co, 0x284, 0x13, odIndexes[3], 0x3, 0x10, 0,1,2);
             co.addSyncListener(new SyncListener());
 
             System.out.println("CanOpen configured");
