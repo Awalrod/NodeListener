@@ -6,7 +6,8 @@ import DataRecording.NodeTracker;
 import GlobalVars.GlobalVars;
 
 import java.util.ArrayList;
-
+import java.util.Date;
+import java.text.SimpleDateFormat;
 /**
  * Created by gcdc on 6/7/17.
  */
@@ -45,7 +46,7 @@ public class DataFormatter {
      * @return A header comment
      */
     public String produceHeader(int[] indexes){
-        String header = ";Time:"+Long.toString(GlobalVars.START_TIME);
+        String header = String(";").concat(SimpleDateFormat("HH:mm:ss").format(Date()));
         for(int index : indexes){
             header = header.concat(","+Integer.toHexString(index)+"(X)");
             header = header.concat(","+Integer.toHexString(index)+"(Y)");
