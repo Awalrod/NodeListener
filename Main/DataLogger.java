@@ -14,7 +14,7 @@ import GlobalVars.GlobalVars;
  */
 public class DataLogger {
     private CanOpen co;
-    private NodeTracker node1, node2, node3, node4;
+    private NodeTracker[] nodes;
     private int odIndexes[] = new int[]{0x6210, 0x6211, 0x6212, 0x6213};
     private DataFormatter dfmt;
     private class SyncListener implements CanOpenListener{
@@ -26,11 +26,11 @@ public class DataLogger {
 		        System.out.println(dfmt.produceHeader(odIndexes));
 	        } else {
 		        //Skip the first sync message since object dictionary entries have not been set
-		        AccelerometerReading readings[] = new AccelerometerReading[4];
-		        readings[0] = node1.getLatestReading();
-		        readings[1] = node2.getLatestReading();
-		        readings[2] = node3.getLatestReading();
-		        readings[3] = node4.getLatestReading();
+		        AccelerometerReading readings[] = new AccelerometerReading[nodes.length];
+		        for(int i = 0; i < nodes.length; i++ ){
+			        readings[i] = nodes[i].getLatestReading();
+		        }
+
 //              System.out.println(dfmt.producePrettyOutputString(readings));
 
 		        System.out.println(dfmt.produceOutputLine(readings));
@@ -52,11 +52,11 @@ public class DataLogger {
             System.out.println("CANbus driver configured");
             ObjectDictionary od = DefaultOD.create(0x23);
             co = new CanOpen(drvr, od, 0x23, false);
-
-            node1 = new NodeTracker(co,0x281,0x10, odIndexes[0],0x3,0x10, 0,1,2);
-            node2 = new NodeTracker(co, 0x282, 0x11, odIndexes[1], 0x3, 0x10, 0,1,2);
-            node3 = new NodeTracker(co, 0x283, 0x12, odIndexes[2], 0x3, 0x10, 0,1,2);
-            node4 = new NodeTracker(co, 0x284, 0x13, odIndexes[3], 0x3, 0x10, 0,1,2);
+			nodes = new NodeTracker[4]
+            nodes[0] = new NodeTracker(co,0x281,0x10, odIndexes[0],0x3,0x10, 0,1,2);
+            nodes[1] = new NodeTracker(co, 0x282, 0x11, odIndexes[1], 0x3, 0x10, 0,1,2);
+            nodes[2] = new NodeTracker(co, 0x283, 0x12, odIndexes[2], 0x3, 0x10, 0,1,2);
+            nodes[3] = new NodeTracker(co, 0x284, 0x13, odIndexes[3], 0x3, 0x10, 0,1,2);
             co.addSyncListener(new SyncListener());
 
             System.out.println("CanOpen configured");
