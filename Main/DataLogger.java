@@ -17,6 +17,7 @@ public class DataLogger {
     private NodeTracker[] nodes;
     private int odIndexes[] = new int[]{0x6210, 0x6211, 0x6212, 0x6213};
     private DataFormatter dfmt;
+    
     private class SyncListener implements CanOpenListener{
         @Override
         public void onMessage(CanMessage canMessage) {
@@ -30,9 +31,7 @@ public class DataLogger {
 		        for(int i = 0; i < nodes.length; i++ ){
 			        readings[i] = nodes[i].getLatestReading();
 		        }
-
-//              System.out.println(dfmt.producePrettyOutputString(readings));
-
+//		        System.out.println(dfmt.producePrettyOutputString(readings));
 		        System.out.println(dfmt.produceOutputLine(readings));
 	        }
         }
@@ -42,7 +41,15 @@ public class DataLogger {
         @Override
         public void onEvent(CanOpen co, int state) {}
     }
-    public DataLogger(String confFile){
+    
+    private class CanOpenThread extends Thread	{
+        @Override
+        public void run(){
+        
+        }
+    }
+    
+    public boolean launch(String confFile){
         dfmt = new DataFormatter();
         Driver drvr;
         try{
@@ -62,16 +69,26 @@ public class DataLogger {
             System.out.println("CanOpen configured");
             System.out.println("CanOpen Starting");
 
-            
             co.start();
-
-
+            
+            System.out.println("co.start() is finished");
         }catch(Exception e){
             e.printStackTrace();
             System.exit(-1);
         }
+        
+        return(false);
     }
+    
+    
     public static void main(String args[]){
-        new DataLogger("test.conf");
+        boolean retval;
+        do
+        {
+            retval = new DataLogger().launch("test.conf");
+            System.out.println(retval);
+        }
+        while(retval);
+        System.out.println("exit");
     }
 }
