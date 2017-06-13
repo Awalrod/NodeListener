@@ -27,7 +27,7 @@ public class CanOpen implements CanMessageConsumer
 	private Driver busDriver;
 	private boolean debug = false;
 
-	private Protocol nmt = null;
+	private Nmt nmt = null;
 	private Sdo sdo = null;
 	private Pdo pdo = null;
 	private Protocol sync = null;
@@ -378,6 +378,14 @@ System.out.println("CanOpen.class WARNING: moving to operational state without m
 		}
 		canOpenState =STATE_PREOPERATIONAL;
 		notifyListeners();
+		try
+		{
+			nmt.sendBootUp();
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
 	}
 
 

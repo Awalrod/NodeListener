@@ -16,7 +16,7 @@ class Nmt extends Protocol
 	static final int RESET_NODE	= 129;
 	static final int RESET_COMM	= 130;
 
-	private void sendBootUp() throws java.io.IOException, Exception
+	void sendBootUp() throws java.io.IOException, Exception
 	{
 		byte dataBytes[] = new byte[1];
 		dataBytes[0] = (byte)canOpen.STATE_INIT;
@@ -86,16 +86,16 @@ System.out.println("sending bootup message: "+String.format("%02x",id));
 		if(super.start())
 		{
 			debugPrint("sending boot up message");
-			try
-			{
-				sendBootUp();
-			}
-			catch(Exception e)
-			{
-				System.out.println("ERROR; starting nmt no nodeid "+e);
-				return(false);
-			}
-			return(true);
+//			try
+//			{
+//				sendBootUp();
+//			}
+//			catch(Exception e)
+//			{
+//				System.out.println("ERROR; starting nmt no nodeid "+e);
+//				return(false);
+//			}
+//			return(true);
 		}
 		return(false);
 	}
