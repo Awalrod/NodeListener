@@ -52,7 +52,7 @@ public class DataLogger {
             System.out.println("CANbus driver configured");
             ObjectDictionary od = DefaultOD.create(0x23);
             co = new CanOpen(drvr, od, 0x23, false);
-			nodes = new NodeTracker[4]
+            nodes = new NodeTracker[4];
             nodes[0] = new NodeTracker(co,0x281,0x10, odIndexes[0],0x3,0x10, 0,1,2);
             nodes[1] = new NodeTracker(co, 0x282, 0x11, odIndexes[1], 0x3, 0x10, 0,1,2);
             nodes[2] = new NodeTracker(co, 0x283, 0x12, odIndexes[2], 0x3, 0x10, 0,1,2);
