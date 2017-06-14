@@ -1,23 +1,21 @@
 package com.gcdc.canopen;
 
 import com.gcdc.can.CanMessage;
-import java.util.TimerTask;
-import java.util.Timer;
 
 import java.util.concurrent.atomic.*;
 
 
-class HeartbeatSession extends TimerTask
+class HeartbeatSession extends Thread
 {
 	Heartbeat heartbeat;
 	OdEntry params;
-	private Timer timer = new Timer();
 
 
 	HeartbeatSession( Heartbeat heartbeat, OdEntry params )
 	{
 		this.heartbeat = heartbeat;
 		this.params = params;
+		setName("HeartbeatSession");
 	}
 
 
@@ -71,12 +69,13 @@ class HeartbeatSession extends TimerTask
 					interval = 5000;
 					System.out.println("ERROR sending Heartbeat signal: "+e);
 				}
-				Thread.sleep(interval);
+				sleep(interval);
 			}
 		}
 		catch(InterruptedException e)
 		{
-			e.printStackTrace();
+		System.out.println("HeartbeatSession interrupted "+e);
+//			e.printStackTrace();
 		}
 	}
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 //class CanOpen extends TimerTask implements CanMessageConsumer
 // a trivial change
-public class CanOpen implements CanMessageConsumer
+public class CanOpen extends Thread implements CanMessageConsumer
 {
 	static final int STATE_INIT  = 0x00;
 	static final int STATE_DISCONNECTED    = 0x01;
@@ -21,6 +21,7 @@ public class CanOpen implements CanMessageConsumer
 	static final int STATE_PREPARING       = 0x02;
 	static final int STATE_STOPPED         = 0x04;
 	static final int STATE_OPERATIONAL     = 0x05;
+	static final int STATE_EXIT	       = 0x71;
 	static final int STATE_PREOPERATIONAL = 0x7F;
 	static final int STATE_UNKNOWN   = 0x0F;
 
@@ -48,6 +49,26 @@ public class CanOpen implements CanMessageConsumer
 		if(debug)
 			System.out.println(smsg);
 	}
+	
+	public void run()
+	{
+		try
+		{
+			this.startTasks();
+			synchronized(this)
+			{
+				wait();
+			}
+		}
+		catch(InterruptedException e1)
+		{
+			toRebootState();
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
 
 
 	public CanOpen( Driver driver, ObjectDictionary od, int nodeId,  boolean DEBUG )
@@ -57,7 +78,6 @@ public class CanOpen implements CanMessageConsumer
 			debug = true;
 		}
 		debugPrint( "CanOpen Init" );
-
 		if(od != null)
 		{
 			objdict = od;
@@ -70,6 +90,7 @@ public class CanOpen implements CanMessageConsumer
 		busDriver = driver;
 		nmt = new Nmt(busDriver, false, this, objdict);
 		toInitializationState();
+		setName("CanOpen Thread");
 
 	}
 
@@ -77,7 +98,7 @@ public class CanOpen implements CanMessageConsumer
 
 
 
-	public void start() throws Exception
+	public void startTasks() throws Exception
 	{
 		if(canOpenState != STATE_INIT)
 			return;
@@ -220,7 +241,7 @@ System.out.println("CanOpen.class WARNING: moving to operational state without m
 		switch(msgType)
 		{
 		case Protocol.SYNC:            /* can be a SYNC or a EMCY message */
-			if(msg.id == 0x080)
+			if((msg.id == 0x080)&&(sync != null))
 			{       // SYNC
 //				debugPrint("pmSYNC");
 				sync.processMessage(msg);
@@ -228,7 +249,7 @@ System.out.println("CanOpen.class WARNING: moving to operational state without m
 			else
 			{       //EMCY
 				debugPrint("pmEMCY");
-				if(emcy.processMessage(msg) == true)
+				if((emcy.processMessage(msg) == true)&&(emcy != null))
 				{
 					emcy.notifyListeners(msg);
 				}
@@ -236,7 +257,7 @@ System.out.println("CanOpen.class WARNING: moving to operational state without m
 		break;
 		case Protocol.TIME_STAMP:
 			debugPrint("pmTIME_STAMP");
-			if(time.processMessage(msg) == true )
+			if((time.processMessage(msg) == true) && (time != null) )
 			{
 				time.notifyListeners(msg);
 			}
@@ -250,24 +271,28 @@ System.out.println("CanOpen.class WARNING: moving to operational state without m
 		case Protocol.PDO4tx:
 		case Protocol.PDO4rx:
 //			debugPrint("pmPDO");
-			pdo.processMessage(msg);
+			if(pdo !=null)
+				pdo.processMessage(msg);
 		break;
 		case Protocol.SDOtx:
 		case Protocol.SDOrx:
 //			debugPrint("pmSDO");
-			sdo.processMessage(msg);
+			if(sdo != null)
+				sdo.processMessage(msg);
 		break;
 		case Protocol.NODE_GUARD:
 //			debugPrint("pmHeartBeat");
-			heartbeat.processMessage(msg);
+			if(heartbeat != null)
+				heartbeat.processMessage(msg);
 		break;
 		case Protocol.NMT:
 			debugPrint("pmNMT");
-			nmt.processMessage(msg);
+			if(nmt != null)
+				nmt.processMessage(msg);
 		break;
 		case Protocol.LSS:
 			debugPrint("pmLSS");
-			if(lss.processMessage(msg) == true)
+			if(lss.processMessage(msg) == true && (lss != null))
 			{
 				lss.notifyListeners(msg);
 			}
@@ -287,7 +312,7 @@ System.out.println("CanOpen.class WARNING: moving to operational state without m
 
 
 	// the four basic states of the CAN-open protocol
-	public void toInitializationState()
+	public void toRebootState()
 	{
 		debugPrint("toInitializationState");
 		if(sdo != null)
@@ -333,7 +358,11 @@ System.out.println("CanOpen.class WARNING: moving to operational state without m
 		}
 
 		System.gc();  //Runs the garbage collector to flush recently disposed objects
+	}
 
+	public void toInitializationState()
+	{
+		toRebootState();
 		try
 		{
 			sdo = new Sdo(busDriver, debug, objdict);
@@ -378,14 +407,14 @@ System.out.println("CanOpen.class WARNING: moving to operational state without m
 		}
 		canOpenState =STATE_PREOPERATIONAL;
 		notifyListeners();
-		try
-		{
-			nmt.sendBootUp();
-		}
-		catch(Exception e)
-		{
-			System.out.println(e);
-		}
+//		try
+//		{
+//			nmt.sendBootUp();
+//		}
+//		catch(Exception e)
+//		{
+//			System.out.println(e);
+//		}
 	}
 
 
@@ -431,7 +460,27 @@ System.out.println("CanOpen.class WARNING: moving to operational state without m
 		canOpenState = STATE_STOPPED;
 		notifyListeners();
 	}
-
+	public void toResetState()
+	{
+		debugPrint("toReset");
+//		try
+		{
+			nmt.stop();
+			sdo.stop();
+			emcy.stop();
+			sync.stop();
+			heartbeat.stop();
+			pdo.stop();
+			lss.stop();
+		}
+//		catch(java.io.IOException e)
+//		{
+//			System.out.println(e);
+//		}
+		canOpenState = STATE_EXIT;
+		notifyListeners();
+	
+	}
 
 	private void setPdoCobId(int index, int cobId) throws Exception
 	{

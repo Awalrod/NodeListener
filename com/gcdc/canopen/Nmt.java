@@ -47,7 +47,7 @@ System.out.println("sending bootup message: "+String.format("%02x",id));
 
 //		debugPrint("in nodid :0x"+toIndexFmt(nodeId));
 //		debugPrint("nodid :0x"+toIndexFmt(canOpen.getNodeId()));
-		if(nodeId != canOpen.getNodeId())
+		if( (nodeId != canOpen.getNodeId())  && (nodeId != 0))
 			return(false);
 
 		int cmd = (0x000000FF & msg.data[0]);
@@ -68,6 +68,9 @@ System.out.println("sending bootup message: "+String.format("%02x",id));
 		break;
 		case RESET_NODE:
 			debugPrint("reset node");
+//			synchronized(canOpen){
+			canOpen.interrupt();
+//			}
 		break;
 		case RESET_COMM:
 			debugPrint("reset comm");
@@ -86,16 +89,16 @@ System.out.println("sending bootup message: "+String.format("%02x",id));
 		if(super.start())
 		{
 			debugPrint("sending boot up message");
-//			try
-//			{
-//				sendBootUp();
-//			}
-//			catch(Exception e)
-//			{
-//				System.out.println("ERROR; starting nmt no nodeid "+e);
-//				return(false);
-//			}
-//			return(true);
+			try
+			{
+				sendBootUp();
+			}
+			catch(Exception e)
+			{
+				System.out.println("ERROR; starting nmt no nodeid "+e);
+				return(false);
+			}
+			return(true);
 		}
 		return(false);
 	}

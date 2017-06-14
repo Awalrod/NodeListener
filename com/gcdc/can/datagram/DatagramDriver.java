@@ -1,7 +1,5 @@
 package com.gcdc.can.datagram;
-import java.util.Timer;
 import com.gcdc.can.CanMessage;
-//import com.gcdc.can.TraceStorm;
 import com.gcdc.can.Driver;
 import com.gcdc.can.CanMessageConsumer;
 
@@ -33,13 +31,35 @@ public class DatagramDriver implements Driver
 
 	public void stopTransfer()
 	{
-//		timer.cancel();
-//		canStorm.isStarted( false );
+		if(backgroundTask != null)
+		{
+			backgroundTask.close();
+			backgroundTask = null;
+			System.gc();
+		}	
 	}
 
 	public void sendMessage( CanMessage telegramm ) throws java.io.IOException
 	{
-		backgroundTask.sendMsg(telegramm);
+		if(backgroundTask!=null)
+		{
+			backgroundTask.sendMsg(telegramm);
+		}
+		else
+		{	
+//			try
+//			{
+//				startTransfer();
+//			}
+//			catch(Exception e)
+//			{
+//				System.out.println("DatagranDriver.sendMessage fatal "+e);
+//				System.exit(-1);
+//			}
+//			backgroundTask.sendMsg(telegramm);
+			System.out.println("DatagramDriver.sendMessage background task not ready");
+		}
+		
 	}
 
 	public CanMessage getMessage()

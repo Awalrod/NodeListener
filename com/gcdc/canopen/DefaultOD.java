@@ -212,7 +212,7 @@ System.out.println("WARNING: hardcoding default rpdo 3&4 node ids to 0x33");
 				index &= 0xFF;
 				System.out.println("Warning index > 0x100");
 			}
-			System.out.println("CobId: "+Integer.toHexString(cobid));
+//			System.out.println("CobId: "+Integer.toHexString(cobid));
 			OdEntry commParamEntry = OdEntry.pdoFactory(0x1400+index, "RPDO "+Integer.toString(index+1), cobid, 0xff, 0, 0);
 			objDict.insert(commParamEntry);
 			
@@ -222,11 +222,11 @@ System.out.println("WARNING: hardcoding default rpdo 3&4 node ids to 0x33");
 			for(int i = 0; i < numSamples;i++)
 			{
 				maps[i] = targetIndex <<16|i<<8|numBits;
-				System.out.println("DefaultOD.insertRxpdo(): Appending SubEntry to "+ Integer.toHexString(maps[i]));
+//				System.out.println("DefaultOD.insertRxpdo(): Appending SubEntry to "+ Integer.toHexString(maps[i]));
 				SubEntry v1 = new SubEntry(SubEntry.AccessType.RW, Integer.toString(i+1), (int)0);
 				od.appendSub(v1);
 			}
-			for(int i : maps){System.out.println(Integer.toHexString(i));}
+//			for(int i : maps){System.out.println(Integer.toHexString(i));}
 			OdEntry mappingEntry = OdEntry.pdoMappingFactoryArray(0x1600+index, "RPDO "+ Integer.toString(index+1) + " mapping parameter", maps);
 			objDict.insert(mappingEntry);
 		}

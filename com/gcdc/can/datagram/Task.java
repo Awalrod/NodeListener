@@ -1,9 +1,5 @@
 package com.gcdc.can.datagram;
 
-//import java.util.Calendar;
-//import java.util.GregorianCalendar;
-//import java.util.Random;
-import java.util.TimerTask;
 import java.net.*;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -27,6 +23,7 @@ public class Task extends Thread
 	{
 		this.port = port;
 		address = InetAddress.getByName(ipAddr);
+		setName("datagramsocketTask");
 //System.out.println("ipAddr: "+ipAddr);
 //System.out.println("addr: "+address);
 //System.out.println("port: "+port);
@@ -109,6 +106,22 @@ public class Task extends Thread
 //		System.out.println("datagram sent to: "+address+" port: "+port );
 	}
 
+	public void close()
+	{
+		System.out.println("Task.close() closing socket connection");
+		if(socket != null)
+		{
+			synchronized(socket)
+			{
+				socket.notify();
+			}
+			socket.close();
+			System.out.println("closed");
+		}
+		socket = null;
+		System.gc();
+	}
+
 
 	public void run()
 	{
@@ -126,8 +139,13 @@ public class Task extends Thread
 				}
 			}
 		}
+		catch(java.net.SocketException se)
+		{
+			System.out.println("Task.run() "+se);
+		}
 		catch(IOException ioe)
 		{
+			System.out.println("Task.run() "+ioe);
 			ioe.printStackTrace();
 		}
 	}

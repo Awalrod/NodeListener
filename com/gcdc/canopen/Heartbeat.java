@@ -15,7 +15,7 @@ class Heartbeat extends Protocol
 	private CanOpen canOpen;  // needed to get the canopen state number
 
 	private OdEntry odComm;
-	private	Timer heartbeatTimer = null;
+	private HeartbeatSession txHeartbeat;
 
 	Heartbeat( Driver driver, boolean DEBUG, ObjectDictionary od1, CanOpen co ) throws Exception
 	{
@@ -38,23 +38,29 @@ class Heartbeat extends Protocol
 	boolean start() throws java.io.IOException
 	{
 		super.start();
-		if(heartbeatTimer != null)
+		if(txHeartbeat != null)
 			return(false);
-
-		heartbeatTimer = new Timer();
 		if(odComm == null)
 			System.out.println("ERROR odComm is null");
-		heartbeatTimer.schedule( new HeartbeatSession(this, odComm), 0 );
+		txHeartbeat = new HeartbeatSession(this, odComm);
+		txHeartbeat.start();
 		return(true);
 	}
 
 
+	@Override
+	boolean stop()
+	{
+		super.stop();
+		return(stopHbSession());
+	}
+
 	boolean stopHbSession()
 	{
-		if(heartbeatTimer == null)
-			return(false);
-		heartbeatTimer.cancel();
-		heartbeatTimer = null;
+//		System.out.println("shutting down tx heartbeat");
+		txHeartbeat.interrupt();
+		txHeartbeat.stop();
+		txHeartbeat = null;
 		System.gc();
 		return(true);
 	}

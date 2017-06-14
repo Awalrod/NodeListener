@@ -77,7 +77,7 @@ public class DriverManager
 	{
 		if( !loaded )
 			return;
-
+		driver.stopTransfer();
 		driver = null;
 		System.gc();
 	}

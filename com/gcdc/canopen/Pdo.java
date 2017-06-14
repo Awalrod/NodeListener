@@ -2,13 +2,9 @@ package com.gcdc.canopen;
 
 import com.gcdc.can.CanMessage;
 import com.gcdc.can.Driver;
-//import com.gcdc.can.CanMessageConsumer;
-import java.util.TimerTask;
-import java.util.Timer;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
-//import java.util.concurrent.atomic.*;
 
 
 class Pdo extends Protocol

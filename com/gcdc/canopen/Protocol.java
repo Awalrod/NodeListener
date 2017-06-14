@@ -104,6 +104,8 @@ class Protocol extends TimerTask
 			return(false);
 		isEnabled = false;
 		timer.cancel();
+		timer = null;
+		this.cancel();
 		return(true);
 	}
 
